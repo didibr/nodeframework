@@ -1,13 +1,15 @@
 //server.js
 // cria servidor HTTP / HTTPS
 //faz funções relativas ao servidor
-const fs = require('fs');
+//const fs = require('fs');
 const path = require('path');
 //const http = require('http');
 const express=require('express');
 const url = require('url');
 const util = require("util");
 const querystring = require('querystring');
+//helper pages
+const helper=require("./helper.js");
 module.exports.req=null;
 module.exports.res=null;
 module.exports.server = null;
@@ -21,6 +23,19 @@ module.exports.pagina =  null;
 module.exports.query=null;
 //localvars
 //module.exporst.local=`${process.cwd()}/`;
+
+ /*  app.use(function (req, res) { //catch error
+    this.srvUrl = url.parse(`http://${req.url}`);
+    console.log(this.srvUrl);
+    if(this.srvUrl.path=='/index.html'){
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.write('<b><br><h3>It Works</h3><br><br>This is a default page of this Server</b>');
+      res.end();
+      return;
+    }
+    res.status(404).send({ msg: `${req.originalUrl} not found` }) ;
+  });*/
+
 module.exports.res=null;
 module.exports.req=null;
 
@@ -40,32 +55,36 @@ const extmap = {
 };
 
 var app = express();
-var UrlDocs=[];
+var UrlDocs={};
 
 var exports = module.exports = {
  Create: function(port){
   module.exports.porta=port;
-  app.use(express.static('src'));  
-  /*  app.use(function (req, res) { //catch error
-    this.srvUrl = url.parse(`http://${req.url}`);
-    console.log(this.srvUrl);
-    if(this.srvUrl.path=='/index.html'){
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.write('<b><br><h3>It Works</h3><br><br>This is a default page of this Server</b>');
-      res.end();
+  app.use(express.static('src'));   
+  app.get('*', function (reqIn, resIn) {
+    module.exports.req=reqIn;
+    module.exports.res=resIn;    
+    module.exports.onReceive();     
+    var achou=false;
+    this.srvUrl = url.parse(`http://${reqIn.url}`);    
+    for (var key in UrlDocs) {                 
+      if(key==this.srvUrl.path){
+        console.log('Request Received '+this.srvUrl.path);
+        UrlDocs[key]();
+        return;
+      }
+    }
+    if(this.srvUrl.path=='/index.html'){ //index.html not created byt server listen
+      module.exports.onSendResp();
       return;
     }
-    res.status(404).send({ msg: `${req.originalUrl} not found` }) ;
-  });*/
-
-  app.get('/', function (reqIn, resIn) {
-    module.exports.req=reqIn;
-    module.exports.res=resIn;
-    //console.log('Request Received');
-    module.exports.onReceive(); 
-    resIn.writeHead(301,{Location: '/index.html'});
-    resIn.end();
+    //not page found 404    
+    console.log('404 NOT FOUND: '+this.srvUrl.path);
+    resIn.writeHead(404, { 'Content-Type': 'text/html' });
+    resIn.write('<div align=center><br><br>Error 404<br><h3>Page not Found: '+this.srvUrl.path+'</h3></div>');
+    resIn.end();   
   });
+  helper(this);
  },
  Start: function(){   
    app.listen(module.exports.porta, function () {
@@ -73,23 +92,23 @@ var exports = module.exports = {
    });
  },
  onReceive:function(){     
-    this.srvUrl = url.parse(`http://${this.req.url}`);
-    this.fullRequest = util.inspect(this.req);
-    this.method = this.req.method;
-    this.rawReaders = [];
+  module.exports.srvUrl = url.parse(`http://${this.req.url}`);
+  module.exports.fullRequest = util.inspect(this.req);
+  module.exports.method = this.req.method;
+  module.exports.rawReaders = [];
     var tmprawReaders=this.req.rawHeaders;
-    this.protocolo = this.srvUrl.protocol;if(this.protocolo==null)this.protocolo='';
+    module.exports.protocolo = this.srvUrl.protocol;if(this.protocolo==null)this.protocolo='';
     var tmpquery = this.srvUrl.query;if(tmpquery==null)tmpquery='';
-    this.pagina =  this.srvUrl.pathname;if(this.pagina==null)this.pagina='';
-    this.query=[];
+    module.exports.pagina =  this.srvUrl.pathname;if(this.pagina==null)this.pagina='';
+    module.exports.query=[];
     //PEGAR RAWHEADERS
     var count=0;
     for (var i = 0; i < tmprawReaders.length; i++) {
       if(count==0){
-        this.rawReaders[tmprawReaders[i]]=null;
+        module.exports.rawReaders[tmprawReaders[i]]=null;
         count+=1;
       }else{
-        this.rawReaders[tmprawReaders[i-1]]=tmprawReaders[i];
+        module.exports.rawReaders[tmprawReaders[i-1]]=tmprawReaders[i];
         count=0;
       }
     }
@@ -102,7 +121,7 @@ var exports = module.exports = {
       var tempq2=tmpquery[i].split('=');
       var key=querystring.unescape(tempq2[0]);
       var value=querystring.unescape(tempq2[1]);
-      this.query[key]=value;
+      module.exports.query[key]=value;
     }}
   
     //teste de saida de queryes
@@ -112,16 +131,11 @@ var exports = module.exports = {
    //this.res.write('Continuar');
    //this.res.end();
    //console.log('Data Rcv');    
-   if(UrlDocs.includes(this.pagina)==false){
-     console.log('Page not Exist: '+this.pagina);
-     this.onSendResp();     
-   }else{
-    console.log('Show Page: '+this.pagina);
-   }
  },
  onSendResp:function(){  
   module.exports.res.writeHead(200, { 'Content-Type': 'text/html' });
-  module.exports.res.write('<b><br><h3>It Works</h3><br><br>This is a default page of this Server</b>');
+  module.exports.res.write('<div align=center><b><br><h1>It Works</h1><br><br>This is a default page of this Server</b><br><br>create page name /index.html to show up'+
+  '<br><br><a href="./?">Framework Helper</a></div>');
   module.exports.res.end();
  },
  sendHtml:function(codigo){
@@ -139,14 +153,7 @@ var exports = module.exports = {
    return util.inspect(objeto);
  },
  onGet: function(url,fmain){ 
-  UrlDocs.push(url);
-  app.get(url, function (reqIn, resIn) {
-    module.exports.req=reqIn;
-    module.exports.res=resIn;
-    //console.log('Request Received');
-    module.exports.onReceive(); 
-    fmain();
-  });
+  UrlDocs[url]=fmain;
  }
 
 
