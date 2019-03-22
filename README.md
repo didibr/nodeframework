@@ -6,33 +6,7 @@
   <link rel="stylesheet" href="./css/bootstrap.min.css" crossorigin="anonymous">
   <link rel="stylesheet" href="./css/solid.min.css" crossorigin="anonymous">
   <link rel="stylesheet" href="./css/fontawesome.min.css" crossorigin="anonymous">
-<style>
-  body{
-   background-color:#1e2021;
-   color:#c1c1c1;
-  }
-  .evs{
-   color:#9291e4;
-  }
-  .exp{
-   color:#940082;
-  }
-  .coment{
-   color:#009400;
-  }
-  .row{
-   padding-bottom:0.5em;
-  }
-  p{
-   line-height:2pt;
-  }
-  .tab1{
-   padding-left:2em;
-  }
-  .tab2{
-   padding-left:2.5em;
-  }
-</style>
+
 <!--- CSS END --->
 </head>
 <body>
@@ -113,15 +87,5 @@
 <!--- BODY END --->
 </div>
 </body>
-  <!--- JAVASCRIPT START --->
-  <script src="./js/jquery.min.js"></script>
-  <script src="./js/fontawesome.min.js"></script>
-  <script src="./js/bootstrap.min.js"></script>
-  <script src="./js/jquery.slim.min.js"></script>
-  <script src="./js/record.js"></script>
-<script>
-$(document).ready(function(){
-});
-</script>
-<!--- JAVASCRIPT END --->
+  
 </html>
