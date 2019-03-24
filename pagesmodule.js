@@ -6,9 +6,11 @@ const repl = require('repl');
 var ss = require("./server.js");
 
 var cssStyles=[];
-cssStyles.push('<link rel="stylesheet" href="./css/bootstrap.min.css" crossorigin="anonymous">');
 cssStyles.push('<link rel="stylesheet" href="./css/solid.min.css" crossorigin="anonymous">');
+//cssStyles.push('<link rel="stylesheet" href="./css/docs.min.css" crossorigin="anonymous">');
 cssStyles.push('<link rel="stylesheet" href="./css/fontawesome.min.css" crossorigin="anonymous">');
+cssStyles.push('<link rel="stylesheet" href="./css/bootstrap.min.css" crossorigin="anonymous">');
+
 
 var jsStyles=[];
 jsStyles.push('<script src="./js/jquery.min.js"></script>');
@@ -38,6 +40,7 @@ var Pgs = function(){
     var compact='\n';
     var compactTab=' ';   
     var showcomments=true;
+    var containerf='';
     private:{colx:[];};
     this.Row={      
       RowArray:[], 
@@ -147,13 +150,17 @@ var Pgs = function(){
 
     var mhome='';
     var mmenu={};
+    var mmenustyle='';
+    var mfixed='';
 
     this.Menu={      
-       Create:function(title,homelink='#'){
+       Create:function(title,homelink='#',fixed=false){
+        if(fixed==false){mfixed='fixed-top';}else{mfixed='sticky-top';}
+        if(fixed==null)mfixed='';
         mmenu={};
-        mhome=`<a class="navbar-brand" href="`+homelink+`">`+title+`</a>`+compact+Tab(4)+
-        `<button class="navbar-toggler" type="button" data-toggle="collapse" aria-expanded="false" aria-label="Toggle navigation">`+
-        compact+Tab(6)+`<span class="navbar-toggler-icon"></span>`+compact+Tab(4)+`</button>`;
+        mhome=`<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">`+
+        compact+Tab(6)+`<span class="navbar-toggler-icon"></span>`+compact+Tab(2)+`</button>`+
+        compact+Tab(2)+`<a class="navbar-brand" href="`+homelink+`">`+title+`</a>`;
        },
        add:function(title,link,suboff=null){
          var menuitem={
@@ -166,6 +173,17 @@ var Pgs = function(){
        }else{
          addSubItem(mmenu,menuitem,suboff,0);
        }
+       },
+       setColor(background,text,link,hover,active){
+        mmenustyle=        
+      '.navbar-custom {'+'background-color: '+background+';'+'}'+
+      '.navbar-custom .navbar-brand,.navbar-custom .navbar-text{'+'color: '+text+';'+'}'+
+      '.navbar-custom .navbar-nav .nav-link {'+'color: '+link+';'+'}'+      
+      '.navbar-custom .nav-item.active .nav-link,.navbar-custom .nav-item:hover .nav-link {'+'color: '+hover+';'+'}'+
+      '.dropdown-menu {'+'background-color: '+background+';'+'}'+
+      '.dropdown-item {'+'color: '+link+';'+'}'+
+      '.dropdown-item:focus, .dropdown-item:hover {'+'color: '+hover+';background-color: '+active+'}'+
+      ``
        }
 
     }
@@ -244,14 +262,62 @@ var Pgs = function(){
       if(Object.keys(mmenu).length==0)if(showcomments==true){return '<!-- NO MENU -->'}else{return ''};        
       var resposta='';
       if(showcomments==true)resposta+='<!--- MENU START --->'+compact;
-      resposta+='<nav class="navbar navbar-expand-lg navbar-light bg-light">'+compact;
+      resposta+='<nav class="navbar '+mfixed+' navbar-dark navbar-custom navbar-expand-lg">'+compact;
       resposta+=Tab(2)+mhome+compact+Tab(2)+'<div class="collapse navbar-collapse" id="menu">'+compact
       +Tab(4)+'<ul class="navbar-nav">'+compact;
       resposta+=getSubItem(mmenu,'',0);                         
       resposta+=Tab(4)+'</ul>'+compact+Tab(2)+'</div>'+compact+'</nav>'+compact;
+      if(mfixed=='fixed-top')resposta+='<br><br>';
       if(showcomments==true)resposta+='<!--- MENU END --->';
       return resposta;
     }
+
+
+     var sslide='';
+     var sslideitem=new Array();
+     var sslideid='';
+
+    this.Slide={
+      Create(id){
+        sslideid=id;
+        sslide = '<div id="'+id+'" class="carousel slide" data-ride="carousel">'+compact+
+        '<div class="carousel-inner">';
+        sslideitem=new Array();
+      },
+      add(item,title,legend){
+       if(sslide=='')return;
+       var first='';
+       if(Object.keys(sslideitem).length==0)first=' active';       
+       var sitem=
+       '<div class="carousel-item'+first+'">'+compact+
+       item+compact+
+       '<div class="carousel-caption d-none d-md-block"><h1>'+title+'</h1><p>'+legend+'</p></div>'+
+       '</div>'+compact;
+       sslideitem.push(sitem);
+      },
+      html(){
+        if(Object.keys(sslideitem).length>0){
+          var resp=sslide;          
+          sslideitem.forEach(function(item){
+            resp+=item; 
+          });
+          resp+='</div>'+compact+'<a class="carousel-control-prev" href="#'+sslideid+'" role="button" data-slide="prev">'+
+          compact+'<span class="carousel-control-prev-icon" aria-hidden="true"></span>'+compact+
+          '<span class="sr-only">Previous</span>'+compact+'</a>'+compact+
+          '<a class="carousel-control-next" href="#'+sslideid+'" role="button" data-slide="next">'+compact+
+          '<span class="carousel-control-next-icon" aria-hidden="true"></span>'+compact+
+          '<span class="sr-only">Next</span>'+compact+
+          '</a>'+compact+'</div>';
+          return resp;
+        }else{
+         return '<!--Empty Slide-->'; 
+        }
+      }
+    }
+
+     
+    
+
 
     this.onAction=function(action,objeto,funcao){
       if(funcao!=null){
@@ -277,7 +343,7 @@ var Pgs = function(){
         var funcao=scrArr[key]['scr'];
         if(objeto=='document'||objeto=='window'){ //document or window         
           if(action=='load'&&objeto=='document'){
-          
+            retorno+='$(document).ready('+funcao+');'+compact;
           }else{
             retorno+=
             `$(`+objeto+`).bind('`+action+`', `+funcao+`);`+compact;  
@@ -337,6 +403,14 @@ var Pgs = function(){
       showcomments=boolea;
     }
 
+    this.Fluid=function(boolea){
+      if(boolea==true){
+        containerf='-fluid';
+      }else{
+        containerf='';
+      }
+    }
+
     function getCSS(arrayitem){
       if(arrayitem==null)return '';
       var respstyle='';
@@ -358,7 +432,7 @@ var Pgs = function(){
         }
         response+=Tab(2)+'}'+compact;
       }      
-      response='<style>'+compact+Tab(2)+response.trim()+compact+'</style>';
+      response='<style>'+compact+Tab(2)+response.trim()+compact+mmenustyle+compact+'</style>';
       return response;
     }
 
@@ -415,10 +489,11 @@ var Pgs = function(){
         jsX=this.Tab(2)+jsX.trim()+compact+this.getScript();
         if(showcomments==true)jsX+=compact+'<!--- JAVASCRIPT END --->';
         return "<!DOCTYPE html>"+compact+"<html>"+compact+
-        "<head>"+compact+"<title>"+this.title+"</title>"+compact+                
+        "<head>"+compact+"<title>"+this.title+"</title>"+compact+  
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">'+compact+              
         cssItems+compact+
         "</head>"+compact+"<body>"+compact+
-        "<div class='container'>"+compact+         
+        "<div class='container"+containerf+"'>"+compact+         
         getMenu()+compact+
         bodyret+compact+
         '</div>'+compact+'</body>'+compact+

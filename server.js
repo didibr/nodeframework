@@ -61,6 +61,7 @@ var exports = module.exports = {
  Create: function(port){
   module.exports.porta=port;
   app.use(express.static('src'));   
+  app.use("/img", express.static(__dirname + '/src/img'));
   app.get('*', function (reqIn, resIn) {
     module.exports.req=reqIn;
     module.exports.res=resIn;    

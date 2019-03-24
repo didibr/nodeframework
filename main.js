@@ -64,12 +64,12 @@ server.onGet('/aa.html',function(){
       'background-color':'#17ec11'   
      }
   };
-  p1.Row.add('prop');
+  p1.Row.add('prop'); //coluna 1
   p1.Row.Col.add('x1');
   p1.selectCol('x1').html('<div style="height:100px;">Test<div align=center></div></div>');
  
 
-  p1.Row.add('id1');
+  p1.Row.add('id1'); //coluna 2
   p1.Row.Col.add('ida');
   p1.selectCol('ida').html('primeira');
   p1.selectCol('ida').css({
