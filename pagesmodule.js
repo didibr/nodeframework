@@ -3,20 +3,21 @@
 //cria estilos e objetos DOM
 var os = require("os");
 const repl = require('repl');
-var ss = require("./server.js");
+const ss = require("./server.js");
+//const uglify = require("uglify-js");
+
 
 var cssStyles=[];
 cssStyles.push('<link rel="stylesheet" href="./css/solid.min.css" crossorigin="anonymous">');
-//cssStyles.push('<link rel="stylesheet" href="./css/docs.min.css" crossorigin="anonymous">');
-cssStyles.push('<link rel="stylesheet" href="./css/fontawesome.min.css" crossorigin="anonymous">');
+cssStyles.push('<link rel="stylesheet" href="./css/messagebox.min.css" crossorigin="anonymous">');
+cssStyles.push('<link rel="stylesheet" href="./css/fontawesome-all.min.css" crossorigin="anonymous">');
 cssStyles.push('<link rel="stylesheet" href="./css/bootstrap.min.css" crossorigin="anonymous">');
 
 
 var jsStyles=[];
 jsStyles.push('<script src="./js/jquery.min.js"></script>');
-jsStyles.push('<script src="./js/fontawesome.min.js"></script>');
 jsStyles.push('<script src="./js/bootstrap.min.js"></script>');
-jsStyles.push('<script src="./js/jquery.slim.min.js"></script>');
+jsStyles.push('<script src="./js/messagebox.min.js"></script>');
 jsStyles.push('<script src="./js/record.js"></script>');
 
 
@@ -316,12 +317,108 @@ var Pgs = function(){
     }
 
      
+    var messageboxid=null;
+    var messageboxx={};
+
+    this.Message={
+      //possible styles - alert alert-primary || secondary || success || danger || warning || info || light || dark
+      Create(id,title,style,bgstyle){
+        var mymsg={
+          'style':style,
+          'bgstyle':bgstyle,
+          'yes':'Ok',
+          'no':'',
+          'title':title,
+          'html':'',
+          'buttons':{},
+          'actionyes':'function(){}',
+          'actionno':'function(){}'
+        }
+        messageboxx[id]=mymsg;
+        messageboxid=id;
+        return messageboxx[id];
+      },
+      select(id){
+        if(typeof(messageboxx[id])=='undefinied')return null;
+        messageboxid=id;
+        return messageboxx[id]
+      },
+      html(htmml){
+        if(htmml!=null)
+        messageboxx[messageboxid]['html']=htmml;
+        return messageboxx[messageboxid]['html'];
+      },
+      addItem(name,label,type){ //type - "text", "password", "select", "checkbox" or "caption"
+        messageboxx[messageboxid]['buttons'][name]={'type':type,'label': '','title': label};
+      },
+      onYes(texto,funcao){
+        if(texto!=null)
+        messageboxx[messageboxid]['yes']=texto;
+        if(funcao!=null){
+          var va=funcao.toString(); //JSON.stringify(funcao);
+          messageboxx[messageboxid]['actionyes']=va;        
+        }
+      },
+      onNo(texto,funcao){
+        if(texto!=null)
+        messageboxx[messageboxid]['no']=texto;
+        if(funcao!=null){
+          var va=funcao.toString(); //JSON.stringify(funcao);
+          messageboxx[messageboxid]['actionno']=va;        
+        }
+      }
+    }
+
+    function getMessages(){
+      var resp='';
+      var first=true;
+      //console.log(Object.keys(messageboxx).length);
+      if(Object.keys(messageboxx).length==0)return '';
+      resp+='var msgShow={'+compact;
+      for (var key in messageboxx) {   
+        var estilo=messageboxx[key]['style'];      
+        var bgestilo=messageboxx[key]['bgstyle'];      
+        var titulo=messageboxx[key]['title'];
+        var msghtml=messageboxx[key]['html'];
+        var action1=messageboxx[key]['actionyes'];
+        var action2=messageboxx[key]['actionno'];
+        var iyes=messageboxx[key]['yes'];
+        var ino=messageboxx[key]['no'];
+        var msgbutton=messageboxx[key]['buttons'];
+        var inputbuttons='';
+        if(estilo!=null){estilo='customClass         :"'+estilo+'",'+compact;}else{estilo='';}
+        if(bgestilo!=null){bgestilo='customOverlayClass         :"'+bgestilo+'",'+compact;}else{bgestilo='';}
+        if(Object.keys(msgbutton).length==0){
+          //inputbuttons='buttonDone      : "OK"';
+        }else{          
+          inputbuttons=' input    : '+JSON.stringify(msgbutton)+','+compact;
+        }     
+        if(ino!=''){
+          ino='buttonFail  : "'+ino+'",'+compact;
+        }     
+        if(first==false)resp+=',';
+        resp+='show_'+key+'(){'+compact+            
+          '$.MessageBox({'+compact+
+          estilo+bgestilo+
+          'title : "'+titulo+'",'+compact+
+          'buttonDone  : "'+iyes+'",'+compact+
+          ino+
+          inputbuttons+
+          ' message  : "'+msghtml+'"'+compact+
+          '}).done('+action1+').fail('+action2+');'+
+        '}';
+        first=false;                
+      }      
+      resp+='};'+compact;
+      resp+=`function ShowMessage(id){var ffnncc1='msgShow';var ffnncc2='show_'+id;this[ffnncc1][ffnncc2]();}`+compact;
+      return resp;
+    }
     
 
 
     this.onAction=function(action,objeto,funcao){
-      if(funcao!=null){
-        var va=funcao.toString(); //JSON.stringify(funcao);
+      var va=funcao.toString(); //JSON.stringify(funcao);
+      if(funcao!=null&&action!=null&&objeto!=null){        
         //va='function '+objeto+'_'+action+va.substring(9);                
         var myscr={
           'obj':objeto,
@@ -329,13 +426,19 @@ var Pgs = function(){
           'scr':va          
         };      
         this.script[objeto+'_'+action]=myscr;
-      }else{
-        if(this.script[objeto+'_'+action]) delete this.script[objeto+'_'+action];
+      }else{        
+        if(action==null&&objeto==null){          
+          if(!this.script['EXTRA'])this.script['EXTRA']={'obj':null,'act':null, 'scr':''};
+          va=this.script['EXTRA']['scr']+'('+va+'());'+compact;
+          this.script['EXTRA']={'obj':null,'act':null, 'scr':va};//add simple script          
+        }else{
+          if(this.script[objeto+'_'+action]) delete this.script[objeto+'_'+action];
+        }        
       }
     };
 
     this.getScript=function(){
-      var retorno='<script>'+compact+'$(document).ready(function(){'+compact;
+      var retorno='$(document).ready(function(){'+compact;
       var scrArr=this.script;
       for (var key in scrArr) {    
         var objeto=scrArr[key]['obj'];
@@ -349,11 +452,16 @@ var Pgs = function(){
             `$(`+objeto+`).bind('`+action+`', `+funcao+`);`+compact;  
           }          
         }else{
-          retorno+=
-          `$('#`+objeto+`').bind('`+action+`', `+funcao+`);`+compact;  
+          if(key=='EXTRA'){
+            retorno+=funcao+compact;  
+          }else{
+            retorno+=
+            `$('#`+objeto+`').bind('`+action+`', `+funcao+`);`+compact;  
+          }          
         }        
       }  
-      return retorno+'});'+compact+'</script>';         
+      retorno+='});'+compact+getMessages();             
+      return '<script>'+compact+retorno+'</script>';
     };
 
     this.selectRow=function(id){
@@ -486,9 +594,10 @@ var Pgs = function(){
         jsStyles.forEach(element2 => {
           jsX+=this.Tab(2)+element2+compact;
         });
-        jsX=this.Tab(2)+jsX.trim()+compact+this.getScript();
+        jsX=this.Tab(2)+jsX.trim()+compact+
+        this.getScript()+compact;        
         if(showcomments==true)jsX+=compact+'<!--- JAVASCRIPT END --->';
-        return "<!DOCTYPE html>"+compact+"<html>"+compact+
+        var pagina="<!DOCTYPE html>"+compact+"<html>"+compact+
         "<head>"+compact+"<title>"+this.title+"</title>"+compact+  
         '<meta name="viewport" content="width=device-width, initial-scale=1.0">'+compact+              
         cssItems+compact+
@@ -496,9 +605,16 @@ var Pgs = function(){
         "<div class='container"+containerf+"'>"+compact+         
         getMenu()+compact+
         bodyret+compact+
-        '</div>'+compact+'</body>'+compact+
+        '</div>'+compact+
+        '<div id="toasterhiddencaller" style="display:block"></div>'+compact+    
+        '</body>'+compact+
         jsX+compact+  
         '</html>';
+        if(compactTab==''){
+          pagina = pagina.replace(/ +(?= )/g,'');//double space
+          pagina = pagina.replace(/\s\s+/g, '');//new lines
+        }
+        return pagina;
     }
 
     return this;

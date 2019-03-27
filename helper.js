@@ -29,6 +29,9 @@ function CreateHelper(server){
         '.tab2': { 
             'padding-left': '2.5em' 
         },
+        '.tab3': { 
+            'padding-left': '3.5em' 
+        },
         '.col:hover i.fa':{
            'color':'#e00dd8'
         }
@@ -36,6 +39,7 @@ function CreateHelper(server){
 
     server.onGet('/?',function(){
         var p1=new pagesModule();
+        //p1.Compactar(true);
         p1.title='Helper Page';
         p1.style=basestyle;
         p1.Row.add('L1');
@@ -50,6 +54,8 @@ function CreateHelper(server){
         p1.selectCol('smpm').html(`<div align=center><p><a href='./?menuexample'>Menu Example</a></p></div>`);
         p1.Row.Col.add('xslid');
         p1.selectCol('xslid').html(`<div align=center><p><a href='./?slide'>Slide Example</a></p></div>`);
+        p1.Row.Col.add('cmp');
+        p1.selectCol('cmp').html(`<div align=center><p><a href='./?samples'>Samples</a></p></div>`);
         
         //server creation
         p1.Row.add('srvcr');
@@ -136,6 +142,45 @@ function CreateHelper(server){
         <p>}</p>
         `);
 
+
+        //MessageBox Functions
+        p1.Message.Create('msgid','Titulo1','alert alert-danger');
+        p1.Message.select('msgid');
+        p1.Message.html('Message Here');
+        p1.Message.addItem('Text1','Sample Input','text');
+        p1.Message.onYes('Enviar',function(data){
+            alert('typed: '+data['Text1']);
+        });
+
+        p1.Row.add('mmsgg');
+        p1.Row.Col.add('msg1');
+        p1.selectCol('msg1').html(`
+        <h5><u>Create Message Input Dialog</u></h5>
+        <p><i class='coment'>//page.Message.Create(ID,Title,DialogClass,BgClass);</i></p>
+        <p><i class='coment'>//page.Message.html(MessageHtml);</i></p>
+        <p><i class='coment'>//page.Message.addItem(ID,DisplayText,Type);</i></p>
+        <p>p1.Message.Create('msgid','Titulo1','alert alert-danger','alert alert-dark');</p>
+        <p>p1.Message.select('msgid');</p>
+        <p>p1.Message.html('Message Here');</p>
+        <p>p1.Message.addItem('Text1','Sample Input','text');</p>
+        <p>p1.Message.onYes('Enviar',function(data){<i class='coment'>//Event on OK click</i></p>
+            <p class="tab1">alert('typed: '+data['Text1']);</p>
+        <p>});</p>
+        <p><i class='coment'>//ShowMessage('msgid'); javascript show message</i></p>
+        <p><a href='JAVASCRIPT:ShowMessage("msgid");'>Show m1</a></p>
+        `);
+
+
+        //Toast Message
+        p1.Row.add('toasted');
+        p1.Row.Col.add('toos1');
+        p1.selectCol('toos1').html(`   
+        <h5><u>Create Toast Message</u></h5>            
+        <p><i class='coment'>function CreateToast(id,delay,icon,header,body,time,background,icon_background)</i></p>
+        <p>CreateToast('toast1','5000','fa-facebook','Facebook','You have new message','now','warning','primary');</p>
+        <p><a href="JAVASCRIPT:CreateToast('toast1','5000','fa-facebook','Facebook','You have new message','now','warning','primary');">Show this Toast</a></p>
+        `);
+
         //JqueryEvents
         p1.Row.add('jevents');
         p1.Row.Col.add('j1');
@@ -149,6 +194,13 @@ function CreateHelper(server){
         <p>});</p>
         <p><a href='./?eventscript'>List of Events</a>`);
         
+
+        //execute this function on ready - add round class to all href
+        p1.onAction(null,null,function(){            
+          $('a').each(function(){
+            $(this).addClass('btn btn-lg rounded-pill btn-outline-primary');
+          });
+        });
 
         server.sendPage(p1); 
     });
@@ -166,7 +218,7 @@ function CreateHelper(server){
         //back header
         p1.Row.add('bck');
         p1.Row.Col.add('bc');
-        p1.selectCol('bc').html(`<div align=center><p><a href='./?'>back to Helper Page</a></p></div>`);
+        p1.selectCol('bc').html(`<div align=center><p><a href='./?' class='btn btn-lg rounded-pill btn-outline-primary'>back to Helper Page</a></p></div>`);
         
         //mouseevents
         p1.Row.add('mevents');
@@ -252,8 +304,7 @@ function CreateHelper(server){
        
         p1.Row.add('r1');
         p1.Row.Col.add('t1');
-        p1.selectCol('t1').html('<br><div align=center><h2>Menu Example</h2></div><br>'+       
-        '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>');
+        p1.selectCol('t1').html('<br><div align=center><h2>Menu Example</h2></div><br>');
 
         p1.Row.add('r2');
         p1.Row.Col.add('c1');
@@ -269,7 +320,7 @@ function CreateHelper(server){
         //back header
         p1.Row.add('bck');
         p1.Row.Col.add('bc');
-        p1.selectCol('bc').html(`<div align=center><p><a href='./?'>back to Helper Page</a></p></div>`);
+        p1.selectCol('bc').html(`<div align=center><p><a href='./?' class='btn btn-lg rounded-pill btn-outline-primary'>back to Helper Page</a></p></div>`);
        
         server.sendPage(p1);
     });
@@ -286,7 +337,7 @@ function CreateHelper(server){
         //back header
         p1.Row.add('bck');
         p1.Row.Col.add('bc');
-        p1.selectCol('bc').html(`<div align=center><p><a href='./?'>back to Helper Page</a></p></div>`);      
+        p1.selectCol('bc').html(`<div align=center><p><a href='./?' class='btn btn-lg rounded-pill btn-outline-primary'>back to Helper Page</a></p></div>`);      
                
         var cssfile=__dirname+'/src/css/shims.json';        
         var cssicons=__dirname+'/src/css/icons.json'; 
@@ -367,7 +418,315 @@ function CreateHelper(server){
 
         p1.Row.add('L1');
         p1.Row.Col.add('t2');        
-        p1.selectCol('t2').html('<div align=center><p><a href="./?">back to Helper Page</a></p></div>');
+        p1.selectCol('t2').html('<div align=center><p><a href="./?" class="btn btn-lg rounded-pill btn-outline-primary">back to Helper Page</a></p></div>');
+        
+        server.sendPage(p1);        
+    });
+
+
+    server.onGet('/?samples',function(){
+        var p1=new pagesModule();
+        p1.title='Samples';        
+        p1.style=basestyle;                
+        p1.Row.add('m1');
+        p1.Row.Col.add('m11');
+        p1.selectCol('m11').html('<br><div align=center><h2>List of Examples</h2></div><br>');
+
+        p1.Row.add('L1');
+        p1.Row.Col.add('t1');        
+        p1.selectCol('t1').html('<div align=center><p><a href="./?" class="btn btn-lg rounded-pill btn-outline-primary">back to Helper Page</a></p></div>');
+            
+        p1.Row.add('sam1');
+        p1.Row.Col.add('sx1');
+        p1.selectCol('sx1').html('<h1>Samples List</h1><br><br>');
+
+
+
+        p1.Row.add('xx0');
+        p1.Row.Col.add('x0');
+        p1.selectCol('x0').html(`
+        <P>Background Colors Example <i class="exp">.bg-NAME</i> works with text too <i class="exp">.text-NAME</i></p>
+<div class="p-3 mb-2 bg-primary text-white">.bg-primary .text-white</div>
+<div class="p-3 mb-2 bg-secondary text-white">.bg-secondary .text-white</div>
+<div class="p-3 mb-2 bg-success text-white">.bg-success .text-white</div>
+<div class="p-3 mb-2 bg-danger text-white">.bg-danger .text-white</div>
+<div class="p-3 mb-2 bg-warning text-dark">.bg-warning .text-dark</div>
+<div class="p-3 mb-2 bg-info text-white">.bg-info .text-white</div>
+<div class="p-3 mb-2 bg-light text-dark">.bg-light .text-dark</div>
+<div class="p-3 mb-2 bg-dark text-white">.bg-dark .text-white</div>
+<div class="p-3 mb-2 bg-white text-dark">.bg-white .text-dark</div>
+<div class="p-3 mb-2 bg-transparent text-dark">.bg-transparent .text-dark</div>
+<br>
+`);
+
+        p1.Row.add('xx1');
+        p1.Row.Col.add('x1');
+        p1.selectCol('x1').html(`
+        <button class="btn btn-secondary" type="button">
+        <span class="fa fa-thumbs-up"></span>
+        Like
+        </button>
+        <button class="btn btn-primary" type="button">
+        <span class="fa fa-thumbs-up"></span>
+        Liked!
+        </button><br><div class="card card-body bg-dark text-white">
+<p>&lt;button class=&quot;btn btn-secondary&quot; type=&quot;button&quot;&gt;</p> 
+<p class='tab1'>&lt;span class=&quot;fa fa-thumbs-up&quot;&gt;&lt;/span&gt;</p>
+<p class='tab1'>Like</P>
+<p>&lt;/button&gt;</p>
+<p>&lt;button class=&quot;btn btn-primary&quot; type=&quot;button&quot;&gt; </p>
+<p class='tab1'>&lt;span class=&quot;fa fa-thumbs-up&quot;&gt; &lt;/span&gt;</p>
+<p class='tab1'>Liked!</p>
+<p>&lt;/button&gt;</p></div>
+<br><br>`);
+
+
+        p1.Row.add('xx2');
+        p1.Row.Col.add('x2');
+        p1.selectCol('x2').html(`
+        <ul class="nav nav-pills">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">
+      <span class="fa fa-comments"></span>
+      Discussions
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">
+      <span class="fa fa-bell-o"></span>
+      Notifications
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">
+      <span class="fa fa-user"></span>
+      Members
+    </a>
+  </li>
+</ul>
+<div class="card card-body bg-dark text-white">
+<p>&lt;ul class=&quot;nav nav-pills&quot;&gt; </p>
+<p class='tab1'>&lt;li class=&quot;nav-item&quot;&gt; </p>
+<p class='tab2'>&lt;a class=&quot;nav-link active&quot; href=&quot;#&quot;&gt; </p>
+<p class='tab3'>&lt;span class=&quot;fa fa-comments&quot;&gt;&lt;/span&gt; </p>
+<p class='tab3'>Discussions </p>
+<p class='tab2'>&lt;/a&gt; </p>
+<p class='tab1'>&lt;/li&gt; </p>
+<p class='tab1'>&lt;li class=&quot;nav-item&quot;&gt; </p>
+<p class='tab2'>&lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt; </p>
+<p class='tab3'>&lt;span class=&quot;fa fa-bell-o&quot;&gt;&lt;/span&gt; </p>
+<p class='tab3'>Notifications </p>
+<p class='tab2'>&lt;/a&gt; </p>
+<p class='tab1'>&lt;/li&gt; </p>
+<p class='tab1'>&lt;li class=&quot;nav-item&quot;&gt; </p>
+<p class='tab2'>&lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt; </p>
+<p class='tab3'>&lt;span class=&quot;fa fa-user&quot;&gt;&lt;/span&gt; </p>
+<p class='tab3'>Members </p>
+<p class='tab2'>&lt;/a&gt; </p>
+<p class='tab1'>&lt;/li&gt;</p> 
+<p>&lt;/ul&gt;</p></div>
+<br><br>`);
+
+
+        p1.Row.add('xx3');
+        p1.Row.Col.add('x3');
+        p1.selectCol('x3').html(`<i class="exp">.rounded-pill</i> to make rounded border <i class="exp">btn-outline-XXX</i> make outline transparent<br>
+        <button type="button" class="btn btn-lg rounded-pill btn-primary">Primary</button>
+<button type="button" class="btn btn-lg rounded-pill btn-outline-secondary">Secondary</button>
+<button type="button" class="btn rounded-pill btn-success">Success</button>
+<button type="button" class="btn rounded-pill btn-info">Info</button>
+<button type="button" class="btn btn-sm rounded-pill btn-outline-warning">Warning</button>
+<button type="button" class="btn btn-sm rounded-pill btn-danger">Danger</button>
+<button type="button" class="btn btn-xs rounded-pill btn-link">Link</button><br>
+<div class="card card-body bg-dark text-white">
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn btn-lg rounded-pill btn-primary</i>&quot;&gt;Primary&lt;/button&gt; </p>
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn btn-lg rounded-pill btn-outline-secondary</i>&quot;&gt;Secondary&lt;/button&gt; </p>
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn rounded-pill btn-success</i>&quot;&gt;Success&lt;/button&gt; </p>
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn rounded-pill btn-info</i>&quot;&gt;Info&lt;/button&gt; </p>
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn btn-sm rounded-pill btn-outline-warning</i>&quot;&gt;Warning&lt;/button&gt; </p>
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn btn-sm rounded-pill btn-danger</i>&quot;&gt;Danger&lt;/button&gt;</p> 
+<p>&lt;button type=&quot;button&quot; class=&quot;<i class='exp'>btn btn-xs rounded-pill btn-link</i>&quot;&gt;Link&lt;/button&gt;</p>
+</div>
+<br><br>`);
+
+        p1.Row.add('xx4');
+        p1.Row.Col.add('x4');
+        p1.selectCol('x4').html(`<p>Use the <i class="exp">.d-flex flex-row</i> classes when you need to keep related elements on the same row, but with flexible individual widths.</p>        
+        <i class="exp">class="btn-group mr-2" role="group"</i> Create group of buttons<br>
+<div class="d-flex flex-row">
+    <input type="text" class="col-6" placeholder="Search orders">
+    <div class="btn-group mr-2" role="group">
+        <button type="button" class="btn btn-success"><span class="fa fa-pencil"></span></button>
+        <button type="button" class="btn btn-danger"><span class="fa fa-remove"></span></button>
+    </div>
+</div>
+<div class="card card-body bg-dark text-white">
+<p>&lt;div class=&quot;d-flex flex-row&quot;&gt; </p>
+<p class='tab1'>&lt;input type=&quot;text&quot; class=&quot;col-6&quot; placeholder=&quot;Search orders&quot;&gt; </p>
+<p class='tab1'>&lt;div class=&quot;btn-group mr-2&quot; role=&quot;group&quot;&gt; </p>
+<p class='tab2'>&lt;button type=&quot;button&quot; class=&quot;btn btn-success&quot;&gt;&lt;span class=&quot;fa fa-pencil&quot;&gt;&lt;/span&gt;&lt;/button&gt; </p>
+<p class='tab2'>&lt;button type=&quot;button&quot; class=&quot;btn btn-danger&quot;&gt;&lt;span class=&quot;fa fa-remove&quot;&gt;&lt;/span&gt;&lt;/button&gt; </p>
+<p class='tab1'>&lt;/div&gt; </p>
+<p>&lt;/div&gt;</p></div>
+<br><br>`);
+
+
+        p1.Row.add('xx4');
+        p1.Row.Col.add('x4');
+        p1.selectCol('x4').html(`
+        <span class="badge badge-primary">Primary</span>
+        <span class="badge badge-secondary">Secondary</span>
+        <span class="badge badge-success">Success</span>
+        <span class="badge badge-danger">Danger</span>
+        <span class="badge badge-warning">Warning</span>
+        <span class="badge badge-info">Info</span>
+        <span class="badge badge-light">Light</span>
+        <span class="badge badge-dark">Dark</span>
+        <button type="button" class="btn btn-primary">
+            Profile <span class="badge badge-danger">9</span>
+            <span class="sr-only">unread messages</span>
+        </button><br>
+        <div class="card card-body bg-dark text-white">
+        <p>&lt;span class=&quot;badge badge-primary&quot;&gt;Primary&lt;/span&gt; </p>
+        <p>&lt;span class=&quot;badge badge-secondary&quot;&gt;Secondary&lt;/span&gt; </p>
+        <p>&lt;span class=&quot;badge badge-success&quot;&gt;Success&lt;/span&gt; </p>
+        <p>&lt;span class=&quot;badge badge-danger&quot;&gt;Danger&lt;/span&gt; </p>
+        <p>&lt;span class=&quot;badge badge-warning&quot;&gt;Warning&lt;/span&gt; </p>
+        <p>&lt;span class=&quot;badge badge-info&quot;&gt;Info&lt;/span&gt;</p>
+        <p>&lt;span class=&quot;badge badge-light&quot;&gt;Light&lt;/span&gt; </p>
+        <p>&lt;span class=&quot;badge badge-dark&quot;&gt;Dark&lt;/span&gt; </p>
+        <p>&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt; </p>
+        <p class='tab1'>Profile &lt;span class=&quot;badge badge-danger&quot;&gt;9&lt;/span&gt; </p>
+        <p class='tab1'>&lt;span class=&quot;sr-only&quot;&gt;unread messages&lt;/span&gt; </p>
+        <p>&lt;/button&gt;</p></div>
+        <br><br>        
+        `);
+
+        p1.Row.add('xx5');
+        p1.Row.Col.add('x5');
+        p1.selectCol('x5').html(`
+        <p>
+            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                Link with href
+            </a>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Button with data-target
+            </button>
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body bg-success text-white">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+            </div>
+        </div>
+        <div class="card card-body bg-dark text-white">
+        <p>&lt;p&gt; </p>
+        <p class='tab1'>&lt;a class=&quot;btn btn-primary&quot; data-toggle=&quot;collapse&quot; href=&quot;#collapseExample&quot; role=&quot;button&quot; </p>
+        <p class='tab1'>aria-expanded=&quot;false&quot; aria-controls=&quot;collapseExample&quot;&gt; </p>
+        <p class='tab2'>Link with href</p>
+        <p class='tab1'>&lt;/a&gt; </p>
+        <p class='tab1'>&lt;button class=&quot;btn btn-primary&quot; type=&quot;button&quot; data-toggle=&quot;collapse&quot; data-target=&quot;#collapseExample&quot;</p> 
+        <p class='tab1'>aria-expanded=&quot;false&quot; aria-controls=&quot;collapseExample&quot;&gt; </p>
+        <p class='tab2'>Button with data-target </p>
+        <p class='tab1'>&lt;/button&gt; </p>
+        <p>&lt;/p&gt; </p>
+        <p>&lt;div class=&quot;collapse&quot; id=&quot;collapseExample&quot;&gt; </p>
+        <p class='tab1'>&lt;div class=&quot;card card-body bg-success text-white&quot;&gt; </p>
+        <p class='tab2'>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica,</p>
+        <p class='tab2'>craft beer labore wes anderson cred nesciunt sapiente ea proident. </p>
+        <p class='tab1'>&lt;/div&gt;</p> 
+        <p>&lt;/div&gt;</p></div>
+        <br><br>`);
+
+
+        p1.Row.add('xx5');
+        p1.Row.Col.add('x5');
+        p1.selectCol('x5').html(`
+        <div class="embed-responsive embed-responsive-16by9 col-4">
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/ePRtorpaKmE?autoplay=1"></iframe>
+        </div>
+        <div class="card card-body bg-dark text-white">
+        <p>&lt;!-- 21:9 aspect ratio --&gt; </p>
+        <p>&lt;div class=&quot;embed-responsive embed-responsive-21by9&quot;&gt; </p>
+        <p class='tab1'>&lt;iframe class=&quot;embed-responsive-item&quot; src=&quot;...&quot;&gt;&lt;/iframe&gt; </p>
+        <p>&lt;/div&gt; </p>
+        <p>&lt;!-- 16:9 aspect ratio --&gt; </p>
+        <p>&lt;div class=&quot;embed-responsive embed-responsive-16by9&quot;&gt; </p>
+        <p class='tab1'>&lt;iframe class=&quot;embed-responsive-item&quot; src=&quot;...&quot;&gt;&lt;/iframe&gt; </p>
+        <p>&lt;/div&gt; &lt;!-- 4:3 aspect ratio --&gt; </p>
+        <p>&lt;div class=&quot;embed-responsive embed-responsive-4by3&quot;&gt; </p>
+        <p class='tab1'>&lt;iframe class=&quot;embed-responsive-item&quot; src=&quot;...&quot;&gt;&lt;/iframe&gt; </p>
+        <p>&lt;/div&gt; &lt;!-- 1:1 aspect ratio --&gt; </p>
+        <p>&lt;div class=&quot;embed-responsive embed-responsive-1by1&quot;&gt; </p>
+        <p class='tab1'>&lt;iframe class=&quot;embed-responsive-item&quot; src=&quot;...&quot;&gt;&lt;/iframe&gt; </p>
+        <p>&lt;/div&gt;</p>
+        </div><br><br>`);
+
+        p1.Row.add('xx6');
+        p1.Row.Col.add('x6');
+        p1.selectCol('x6').html(`
+        <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mod1">
+  Launch demo modal
+</button>
+<!--- modal dialog -->
+<div id="mod1" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      ... Text Here
+    </div>
+  </div>
+</div><br><div class="card card-body bg-dark text-white">
+<p><i class="exp">&lt;!-- Button trigger modal --&gt; </i></p>
+<p>&lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot; data-toggle=&quot;modal&quot; data-target=&quot;#mod1&quot;&gt; </p>
+<p class='tab1'>Launch demo modal </p>
+<p>&lt;/button&gt; </p>
+<p><i class="exp">&lt;!--- modal dialog --&gt; </i></p>
+<p>&lt;div id=&quot;mod1&quot; class=&quot;modal fade bd-example-modal-lg&quot; tabindex=&quot;-1&quot; role=&quot;dialog&quot; aria-labelledby=&quot;myLargeModalLabel&quot; aria-hidden=&quot;true&quot;&gt; </p>
+<p class='tab1'>&lt;div class=&quot;modal-dialog modal-lg&quot;&gt; </p>
+<p class='tab2'>&lt;div class=&quot;modal-content&quot;&gt; </p>
+<p class='tab3'>... Text Here </p>
+<p class='tab2'>&lt;/div&gt; </p>
+<p class='tab1'>&lt;/div&gt; </p>
+<p>&lt;/div&gt;</p></div><br><br>`);
+
+
+
+        p1.Row.add('xx7');
+        p1.Row.Col.add('x7');
+        p1.selectCol('x7').html(`<div class="spinner-border text-primary" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-secondary" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-success" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-danger" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-warning" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-info" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-light" role="status">
+  <span class="sr-only">Loading...</span>
+</div>
+<div class="spinner-border text-dark" role="status">
+  <span class="sr-only">Loading...</span>
+</div><br><div class="card card-body bg-dark text-white">
+<p>&lt;div class=&quot;spinner-border text-primary&quot; role=&quot;status&quot;&gt; </p>
+<p class='tab1'>&lt;span class=&quot;sr-only&quot;&gt;Loading...&lt;/span&gt; </p>
+<p>&lt;/div&gt;</p>
+</div><br><br>`);
+
+        p1.Row.add('L1');
+        p1.Row.Col.add('t2');     
+        var t1h=p1.selectCol('t1').html();   
+        p1.selectCol('t2').html(t1h);
+        
         
         server.sendPage(p1);        
     });

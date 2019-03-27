@@ -4,8 +4,9 @@ var pagesModule = require("./pagesmodule.js");
 server.Create(80);
 server.Start();
 
-server.onGet('/x.html',function(){
+server.onGet('/x',function(){
   var p1=new pagesModule();
+  p1.Compactar(false);
   p1.title='Sei la';
   p1.Row.add('Linha');
   p1.Row.Col.add('bloco1');
@@ -15,6 +16,31 @@ server.onGet('/x.html',function(){
   p1.onAction('resize','window',function(){            
     var vw=$(window).width();
     $('#x1').val('resized to: '+vw);
+  });
+
+
+  p1.Message.Create('m1','Titulo1','alert alert-danger','alert alert-warning');
+  p1.Message.select('m1');
+  p1.Message.html('Message Here');
+  p1.Message.addItem('Text1','Sample Input','text');
+  p1.Message.onYes('Enviar',function(data){
+    alert('typed: '+data['Text1']);
+  });
+
+  /*
+  p1.Message.Create('m1','Titulo1','alert alert-danger');
+  p1.Message.select('m1');
+  p1.Message.html('This is a test only');
+  p1.Message.addItem('tt1','Homen','checkbox');
+  p1.Message.addItem('tt2','Mulher','checkbox');
+  p1.Message.onYes('Enviar',function(data){
+    $('#x1').val('msg enviada: '+data['tt1']);
+  });
+  */
+
+  p1.selectCol('bloco2').html('<input type="button" id="bt1" value="OK"/>');
+  p1.onAction('click','bt1',function(){
+    ShowMessage('m1');
   });
 
   server.sendPage(p1); 
@@ -98,16 +124,15 @@ server.onGet('/index2.html',function(){
   p1.Compactar(true);
   p1.Row.add('row1');
   p1.Row.Col.add('idb');
-  var rtx=p1.selectRow('row1').html();
-  //console.log(server.print_r(xx1));
- /* p1.selectRow('row1').html('<div><b>TEST</b>work html div');
-  p1.selectRow('row1').css({
-    'background-color':'blue'
+  p1.selectCol('idb').html(
+    '<input id="x3" type="text" value="0"></input>'+
+    '<input id="x2" type="text" value="5000"></input>'+
+    '<input id="x1" type="button" value="Create"></input>'
+    );  
+  p1.onAction('click','x1',function(){            
+    CreateToast('toast1','5000','fa-facebook','Facebook','You have new message','now','warning','primary');
   });
- */ 
-  p1.Row.add('id1');
-  p1.Row.Col.add('ida');
-  p1.selectCol('ida').html(rtx);
+ 
   
   
   server.sendPage(p1); 

@@ -75,7 +75,7 @@ var exports = module.exports = {
         return;
       }
     }
-    if(this.srvUrl.path=='/index.html'){ //index.html not created byt server listen
+    if(this.srvUrl.path=='/index.html'||this.srvUrl.path=='/'){ //index.html not created byt server listen
       module.exports.onSendResp();
       return;
     }
